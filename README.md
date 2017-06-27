@@ -15,7 +15,7 @@ Para testes constrolados, será usado um servidor HTTP Apache como vítima do at
 
 ## Metodologia de desenvolvimento
 
-Esse projeto está sendo desenvolvido usando a metodologia Extreme Programming (*[XP][XP]*). Além disso, as tarefas criadas a partir dessas histórias possuem referência a qual história elas possuem nas *[Issues][ISSUES]* criadas para elas.
+Esse projeto está sendo desenvolvido usando a metodologia Extreme Programming (*[XP][XP]*). As votações a respeito da complexidade dessas histórias estão sendo feitas através da plataforma do Plan IT Poker (e podem ser acessadas *[aqui][PLANITPOKER]*). Por fim, as tarefas criadas a partir dessas histórias possuem referência a qual história elas possuem nas *[Issues][ISSUES]* criadas para elas.
 
 ## Diretrizes do projeto
 
@@ -42,5 +42,5 @@ As mensagens de commit seguem um padrão especificado *[aqui][GITMSG]*.
 [WINDOWS]: http://httpd.apache.org/docs/2.4/platform/windows.html
 [HTTPOST]: https://www.acunetix.com/blog/articles/http-post-denial-service/
 [SYNFLOOD]: https://www.incapsula.com/ddos/attack-glossary/syn-flood.html
-
+[PLANITPOKER]: http://www.planitpoker.com/board/#/room/e3294ada6176461e8bb31fcf4ef48f10
 
