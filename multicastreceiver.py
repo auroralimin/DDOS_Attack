@@ -2,31 +2,51 @@ import socket
 import struct
 import sys
 
-#TODO: thread a ser implementada em cada servo
-mCastGrpAddr = '224.1.1.1'
-mCastPort = 5007
-serverAddr = ('', mCastPort)
+class Body(object):
+    body = ""
 
-# Tell the operating system to add the socket to the multicast group
-# on all interfaces.
-group = socket.inet_aton(mCastGrpAddr)
-mreq = struct.pack('4sL', group, socket.INADDR_ANY)
+class Reply(object):
+    reply = ""
 
-# Create the socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+def configMulticastSock():
+    mCastGrpAddr = '224.1.1.1'
+    mCastPort = 5007
+    serverAddr = ('', mCastPort)
 
-# Bind to the server address
-sock.bind(serverAddr)
+    # Tell the operating system to add the socket to the multicast group
+    # on all interfaces.
+    group = socket.inet_aton(mCastGrpAddr)
+    mreq = struct.pack('4sL', group, socket.INADDR_ANY)
 
-# Receive/respond loop
-while True:
-    print >>sys.stderr, '\nwaiting to receive message'
-    body, masterAddr = sock.recvfrom(1024)
-    
-    print >>sys.stderr, 'received %s bytes from %s' % (len(body), masterAddr)
-    print >>sys.stderr, body
+    # Create the socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-    print >>sys.stderr, 'sending acknowledgement to', masterAddr
-    sock.sendto('ack', masterAddr)
+    # Bind to the server address
+    sock.bind(serverAddr)
+    return sock
+
+def rcvMsg(sock, aliveEvent, msgEvent, readEvent): 
+    print '[MSG_RECEIVER] rcvMsg thread started\n'
+    # Receive/respond loop
+    while aliveEvent.is_set():
+        print '[MSG_RECEIVER] Waiting to receive message...\n'
+        Body.body, masterAddr = sock.recvfrom(1024)
+        
+        msgEvent.set()
+        readEvent.wait()
+        readEvent.clear()
+
+        print '[MSG_RECEIVER] Received %s bytes from %s\n' %\
+            (len(Body.body), masterAddr)
+
+        print '[MSG_RECEIVER] Sending reply to', masterAddr, '\n'
+        sock.sendto(Reply.reply, masterAddr)
+        Reply.reply = ""
+
+def getBody():
+    return Body.body
+
+def setReply(reply):
+    Reply.reply = reply
 

@@ -33,9 +33,9 @@ def sendMsgToSlaves(body, sock):
         try:
             response, slaveAddr = sock.recvfrom(1024)
         except socket.timeout:
-            print >>sys.stderr, '   Timed out, no more responses'
+            print >>sys.stderr, '    Timed out, no more responses'
             break
         else:
-            print >>sys.stderr, '   Received "%s" from slave %s' %\
+            print >>sys.stderr, '    Received "%s" from slave %s' %\
                 (response, slaveAddr)
 
