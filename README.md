@@ -1,6 +1,19 @@
 # DDOS_Attack
 Esse projeto foi desenvolvido como requisito da disciplina Teleinformática e Redes 2, da Universidade de Brasília (UnB).
 
+## Como Usar
+Para o "autocomplete" funcionar execute:
+
+	$ sudo pip install gnureadline
+
+Para interpretar o código de ataque master:
+	
+	$ python master.py
+	
+Para interpretar o código de ataque servo:
+
+	$ sudo python servo.py
+
 ## Ataques
 Esse projeto visa implementar dois tipos de ataque de negação de serviço e então distribuí-los: O *[SYN Flood][SYNFLOOD]* e o *[HTTP Post][HTTPOST]*.
 
