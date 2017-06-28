@@ -78,6 +78,6 @@ def httpPost(ID, portDest, ipDest, event, queue, n):
                     socketsList.append(s)
             except socket.error:
                 break
-        time.sleep(15)
+        event.wait(timeout=15)
 
     queue.task_done()
