@@ -40,17 +40,17 @@ class my_prompt(Cmd):
 
                 if '-n' in args:
                     iN = args.index('-n') + 1
-                    body += iN + ';'
+                    body += args[iN] + ";"
                 else:
                     error = True
                 if '-port' in args:
                     iPort = args.index('-port') + 1
-                    body += iPort + ';'
+                    body += args[iPort] + ";"
                 else:
                     error = True
                 if '-ip' in args:
                     iIP = args.index('-ip') + 1
-                    body += iIP
+                    body += args[iIP]
                 else:
                     error = True
                 if '-time' in args:
@@ -84,17 +84,17 @@ class my_prompt(Cmd):
 
                 if '-n' in args:
                     iN = args.index('-n') + 1
-                    body += iN + ';'
+                    body += args[iN] + ";"
                 else:
                     error = True
                 if '-port' in args:
                     iPort = args.index('-port') + 1
-                    body += iPort + ';'
+                    body += args[iPort] + ";"
                 else:
                     error = True
                 if '-ip' in args:
                     iIP = args.index('-ip') + 1
-                    body += iIP
+                    body += args[iIP]
                 else:
                     error = True
                 if '-time' in args:
