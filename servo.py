@@ -62,18 +62,19 @@ def stopAttack(event, queue, attack):
     reply = "SYN Flood attack stoped"
     if (attack == 1):
         reply = "HTTP Post attack stoped"
-    setReply(reply)
+    return reply
 
 def checkTime(aEvents, aTimes, aTimesStart, aQueues):
     for i in range(0, 1):
         attack = 'SYN Flood'
         if (i > 0):
             attack = 'HTTP Post'
-        if (aTimes[0] > 0) & ((time.time() - aTimesStart[0]) > aTimes[0]):
+        if (aEvents[i].is_set()) & (aTimes[i] > 0) &\
+           ((time.time() - aTimesStart[i]) > aTimes[i]):
             print "[SERVO] Finishing %s (lasted for %s seconds)...\n" %\
-                  (attack, aTimes[0])
-            stopAttack(aEvents[0], aQueues[0], 0)
-            aTimes[0] = -1
+                  (attack, aTimes[i])
+            stopAttack(aEvents[i], aQueues[i], i)
+            aTimes[i] = -1
 
 ################################### INICIO ##################################### 
 if __name__ == '__main__':
@@ -93,7 +94,18 @@ if __name__ == '__main__':
         aFlag = 0
         if words[0] == 'http-post':
             aFlag = 1
-
+        elif words[0] == 'end':
+            print "[SERVO] End signal received. Ending..."
+            for i in range(0, 1):
+                if aEvents[i].is_set():
+                    stopAttack(aEvents[i], aQueues[i], i)
+            setReply("[SERVO] Attacks terminated")
+            eAlive.clear()
+            eRead.set()
+            eMsg.clear()
+            rcvThread.join()
+            break
+       
         if words[1] == 'start':
             try:
                 if (len(words) > 5):
@@ -106,11 +118,13 @@ if __name__ == '__main__':
                                                  aEvents[aFlag], aFlag, -1)
             except:
                 setReply("Failed to initialize attack threads")
-        else:
-            stopAttack(aEvents[aFlag], aQueues[aFlag], aFlag)
-        
+        elif (words[1] == 'stop') & (aEvents[aFlag].is_set()):
+            reply = stopAttack(aEvents[aFlag], aQueues[aFlag], aFlag)
+            setReply(reply)
+            
         eRead.set()
         eMsg.clear()
 
     sock.close()
-
+    print "[SERVO] Stoped"
+    

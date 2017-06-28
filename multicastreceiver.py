@@ -43,6 +43,7 @@ def rcvMsg(sock, aliveEvent, msgEvent, readEvent):
         print '[MSG_RECEIVER] Sending reply to', masterAddr, '\n'
         sock.sendto(Reply.reply, masterAddr)
         Reply.reply = ""
+    print '[MSG_RECEIVER] rcvMsg thread ended\n'
 
 def getBody():
     return Body.body
