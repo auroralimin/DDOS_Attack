@@ -4,6 +4,7 @@ import socket
 import time
 import Queue
 from multicastreceiver import *
+from httppost import *
 from synflood import *
 
 def initRcvThread():
