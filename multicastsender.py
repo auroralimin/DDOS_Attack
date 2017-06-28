@@ -7,6 +7,9 @@ mCastPort = 5007
 mCastGroup = (mCastGrpAddr, mCastPort)
 
 def configMulticastSock():
+    # Create the datagram socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
     # Set socket time to live 
     # Setting 1 keeps the packet in the local network segment.
     ttl = struct.pack('b', 1)
@@ -16,32 +19,23 @@ def configMulticastSock():
 
     # Set a timeout so the socket does not block indefinitely when trying
     # to receive data.
-    sock.settimeout(1)
+    sock.settimeout(0.2)
+    return sock
 
-def sendMsgToSlaves(body):  
+def sendMsgToSlaves(body, sock):  
     # Send data to the multicast group
-    print >>sys.stderr, 'sending "%s"' % body
+    print >>sys.stderr, '    Sending "%s" to slaves' % body
     sent = sock.sendto(body, mCastGroup)
 
     # Look for responses from all recipients
+    print >>sys.stderr, '    Responses from slaves: '
     while True:
-        print >>sys.stderr, 'Responses from slaves: '
         try:
             response, slaveAddr = sock.recvfrom(1024)
         except socket.timeout:
-            print >>sys.stderr, 'timed out, no more responses'
+            print >>sys.stderr, '   Timed out, no more responses'
             break
         else:
-            print >>sys.stderr, 'received "%s" from slave %s' % (response, slaveAddr)
+            print >>sys.stderr, '   Received "%s" from slave %s' %\
+                (response, slaveAddr)
 
-if __name__ == '__main__':
-    # Create the datagram socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-
-    # Config socket for multicast
-    configMulticastSock()
-    try:
-        sendMsgToSlaves("BODY COM OS COMANDOS E TAL")
-    finally:
-        print >>sys.stderr, 'closing socket'
-        sock.close()
