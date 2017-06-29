@@ -19,7 +19,7 @@ def configMulticastSock():
 
     # Set a timeout so the socket does not block indefinitely when trying
     # to receive data.
-    sock.settimeout(1)
+    sock.settimeout(3)
     return sock
 
 def sendMsgToSlaves(body, sock):  
